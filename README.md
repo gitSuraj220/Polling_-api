@@ -18,20 +18,10 @@ Description :
  ```
  ---
 
-## Install
 
 ```
-$ git clone https://github.com/ashishpal07/API-Polling-system
-$ cd Api-Polling-system
-$ npm install
-```
-## Configuration
-Open ```a/nice/path/to/a.file``` then edit it with your settings. You will need:
-* A setting
-* one more setting
-* Another one more setting
 
-## Run the project
+
 
 ```
 $ npm start

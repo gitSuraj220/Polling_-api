@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f1320; color: #e7eaf3; padding: 36px; width: 1180px; }
+  h1 { font-size: 26px; margin-bottom: 4px; }
+  h1 .mono { color: #6ee7b7; font-family: ui-monospace, monospace; font-size: 20px; }
+  .sub { color: #8b93a7; font-size: 14px; margin-bottom: 28px; }
+  .panel { background: #161b2e; border: 1px solid #283150; border-radius: 12px; padding: 22px 24px; margin-bottom: 22px; }
+  .panel h2 { font-size: 16px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; color: #c7d0e6; }
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .box { border-radius: 9px; padding: 12px 14px; font-size: 13px; line-height: 1.35; text-align: center; min-width: 96px; }
+  .in { background: #1d2b4d; border: 1px solid #3b5bdb; }
+  .key { background: #3a2a14; border: 1px solid #b8861b; }
+  .rand { background: #14302a; border: 1px solid #1f9d77; }
+  .engine { background: #2a1140; border: 1px solid #9b4dff; font-weight: 700; min-width: 140px; }
+  .out { background: #2d1320; border: 1px solid #e23357; }
+  .lbl { font-size: 11px; color: #8b93a7; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+  .mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
+  .arrow { color: #6ee7b7; font-size: 22px; font-weight: 700; }
+  .arrow.down { width: 100%; text-align: center; }
+
+  /* byte layout */
+  .bytes { display: flex; border-radius: 9px; overflow: hidden; border: 1px solid #283150; }
+  .seg { padding: 16px 12px; text-align: center; font-size: 13px; }
+  .seg .big { font-size: 15px; font-weight: 700; display: block; }
+  .seg .sz { font-size: 11px; color: rgba(255,255,255,.75); }
+  .nonce { background: #1f9d77; flex: 0 0 200px; }
+  .ct { background: #3b5bdb; flex: 1; }
+  .tag { background: #e23357; flex: 0 0 200px; }
+  .note { font-size: 12.5px; color: #9aa3ba; margin-top: 12px; line-height: 1.5; }
+  .note b { color: #c7d0e6; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .chk { color: #6ee7b7; } .fail { color: #ff7a90; }
+</style>
+</head>
+<body>
+  <h1>AES-256-GCM utility — <span class="mono">AESGCMCipher</span></h1>
+  <div class="sub">Authenticated encryption: confidentiality + integrity, with a fresh random nonce per message and optional AAD binding.</div>
+
+  <div class="panel">
+    <h2>① Encrypt</h2>
+    <div class="flow">
+      <div class="box in"><span class="lbl">input</span>plaintext<br/><span class="mono">bytes</span></div>
+      <div class="box in"><span class="lbl">optional</span>AAD<br/><span class="mono">b"user-42"</span></div>
+      <div class="box key"><span class="lbl">secret</span>256-bit key<br/><span class="mono">32 bytes</span></div>
+      <div class="box rand"><span class="lbl">CSPRNG</span>random nonce<br/><span class="mono">os.urandom(12)</span></div>
+      <span class="arrow">→</span>
+      <div class="box engine"><span class="lbl" style="color:#d9b8ff">AES-256-GCM</span>encrypt</div>
+      <span class="arrow">→</span>
+      <div class="box out"><span class="lbl">token</span><span class="mono">nonce ‖ ct+tag</span></div>
+      <span class="arrow">→</span>
+      <div class="box out"><span class="lbl">transport</span>url-safe<br/>base64</div>
+    </div>
+    <div class="note"><b>Key safety:</b> the caller can never pass the nonce in — a fresh one is generated every call, so catastrophic (key, nonce) reuse is impossible by construction.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Token wire format</h2>
+    <div class="bytes">
+      <div class="seg nonce"><span class="big">NONCE</span><span class="sz">12 bytes · 96-bit</span></div>
+      <div class="seg ct"><span class="big">CIPHERTEXT</span><span class="sz">N bytes · encrypted plaintext</span></div>
+      <div class="seg tag"><span class="big">GCM TAG</span><span class="sz">16 bytes · 128-bit auth</span></div>
+    </div>
+    <div class="note">Minimum valid token = <b>12 + 16 = 28 bytes</b> (empty plaintext). The tag authenticates the ciphertext <i>and</i> the AAD.</div>
+  </div>
+
+  <div class="panel">
+    <h2>② Decrypt &amp; verify</h2>
+    <div class="flow">
+      <div class="box out"><span class="lbl">input</span>token + same AAD</div>
+      <span class="arrow">→</span>
+      <div class="box in"><span class="lbl">split</span>nonce ‖ ct+tag</div>
+      <span class="arrow">→</span>
+      <div class="box engine"><span class="lbl" style="color:#d9b8ff">AES-256-GCM</span>verify tag<br/>then decrypt</div>
+      <span class="arrow">→</span>
+      <div class="box in chk"><span class="lbl">tag OK</span>✔ plaintext</div>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <div class="note"><b class="chk">✔ Authentic</b> — nonce, ciphertext, tag and AAD all match → original plaintext returned.</div>
+      <div class="note"><b class="fail">✖ Any tampering</b> — wrong key, flipped bit, mismatched/missing AAD, or truncated input → single <span class="mono">DecryptionError</span> (no oracle, no partial plaintext).</div>
+    </div>
+  </div>
+
+  <div class="sub" style="margin:0">45 pytest tests cover round-trips · nonce uniqueness (2000×) · AAD binding · tamper detection · key validation · malformed input.</div>
+</body>
+</html>

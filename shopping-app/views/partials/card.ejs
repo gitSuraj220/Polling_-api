@@ -1,0 +1,21 @@
+<div class="card">
+  <a href="/product/<%= product.id %>" class="card-img">
+    <img src="<%= product.image %>" alt="<%= product.brand %> <%= product.name %>" loading="lazy" />
+    <form action="/wishlist/toggle/<%= product.id %>" method="post" class="wish-btn">
+      <button type="submit" aria-label="Toggle wishlist">♥</button>
+    </form>
+  </a>
+  <a href="/product/<%= product.id %>" class="card-body">
+    <div class="brand"><%= product.brand %></div>
+    <div class="name"><%= product.name %></div>
+    <div class="rating">★ <%= product.rating %> <span>| <%= product.ratingCount.toLocaleString('en-IN') %></span></div>
+    <div class="price">
+      <span class="now">₹<%= product.price.toLocaleString('en-IN') %></span>
+      <span class="mrp">₹<%= product.mrp.toLocaleString('en-IN') %></span>
+      <span class="off">(<%= discountPercent(product) %>% OFF)</span>
+    </div>
+  </a>
+  <form action="/cart/add/<%= product.id %>" method="post">
+    <button type="submit" class="btn-add">Add to Bag</button>
+  </form>
+</div>

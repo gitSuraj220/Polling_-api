@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="logo">M<span>art</span></a>
+      <nav class="nav-links">
+        <% categories.forEach(function(cat){ %>
+          <a href="/?category=<%= encodeURIComponent(cat) %>"
+             class="<%= activeCategory === cat ? 'active' : '' %>"><%= cat %></a>
+        <% }); %>
+      </nav>
+      <form class="search" action="/" method="get">
+        <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>"
+               placeholder="Search for products, brands and more" />
+        <% if (activeCategory) { %>
+          <input type="hidden" name="category" value="<%= activeCategory %>" />
+        <% } %>
+        <button type="submit" aria-label="Search">⌕</button>
+      </form>
+      <div class="nav-actions">
+        <a href="/wishlist" class="action">
+          ♥ Wishlist
+          <% if (wishlistCount > 0) { %><span class="badge"><%= wishlistCount %></span><% } %>
+        </a>
+        <a href="/cart" class="action">
+          🛍 Bag
+          <% if (cartCount > 0) { %><span class="badge"><%= cartCount %></span><% } %>
+        </a>
+      </div>
+    </div>
+  </header>
+  <main class="container">

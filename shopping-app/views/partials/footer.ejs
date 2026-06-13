@@ -1,0 +1,25 @@
+  </main>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <h4>Shop</h4>
+        <% categories.forEach(function(cat){ %>
+          <a href="/?category=<%= encodeURIComponent(cat) %>"><%= cat %></a>
+        <% }); %>
+      </div>
+      <div>
+        <h4>About</h4>
+        <a href="#">Contact Us</a>
+        <a href="#">FAQ</a>
+        <a href="#">Terms & Conditions</a>
+      </div>
+      <div>
+        <h4>Mart</h4>
+        <p class="muted">A Myntra-inspired demo storefront. Built with Express + EJS. All products and data are fictional.</p>
+      </div>
+    </div>
+    <p class="copyright">© <%= new Date().getFullYear() %> Mart — demo project, not affiliated with Myntra.</p>
+  </footer>
+  <script src="/js/main.js"></script>
+</body>
+</html>

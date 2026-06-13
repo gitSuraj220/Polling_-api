@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+
+<% if (!activeCategory && !q) { %>
+  <section class="hero">
+    <div class="hero-text">
+      <h1>End of Season Sale</h1>
+      <p>Up to 80% off across Men, Women, Kids, Home & Beauty</p>
+      <a href="#listing" class="btn-primary">Shop Now</a>
+    </div>
+  </section>
+<% } %>
+
+<section class="toolbar" id="listing">
+  <h2>
+    <% if (q) { %>Results for "<%= q %>"
+    <% } else if (activeCategory) { %><%= activeCategory %>
+    <% } else { %>All Products<% } %>
+    <span class="count"><%= products.length %> items</span>
+  </h2>
+  <form method="get" class="sort">
+    <% if (activeCategory) { %><input type="hidden" name="category" value="<%= activeCategory %>" /><% } %>
+    <% if (q) { %><input type="hidden" name="q" value="<%= q %>" /><% } %>
+    <label>Sort by:</label>
+    <select name="sort" onchange="this.form.submit()">
+      <option value="" <%= sort === '' ? 'selected' : '' %>>Recommended</option>
+      <option value="price-asc" <%= sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+      <option value="price-desc" <%= sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+      <option value="discount" <%= sort === 'discount' ? 'selected' : '' %>>Better Discount</option>
+      <option value="rating" <%= sort === 'rating' ? 'selected' : '' %>>Customer Rating</option>
+    </select>
+  </form>
+</section>
+
+<% if (products.length === 0) { %>
+  <p class="empty">No products found. Try a different search or category.</p>
+<% } else { %>
+  <section class="grid">
+    <% products.forEach(function(product){ %>
+      <%- include('partials/card', { product: product }) %>
+    <% }); %>
+  </section>
+<% } %>
+
+<%- include('partials/footer') %>

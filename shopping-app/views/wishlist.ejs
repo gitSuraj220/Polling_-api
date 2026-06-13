@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<h1 class="page-title">My Wishlist <span class="count"><%= items.length %> items</span></h1>
+
+<% if (items.length === 0) { %>
+  <div class="empty-state">
+    <p>Your wishlist is empty.</p>
+    <a href="/" class="btn-primary">Explore Products</a>
+  </div>
+<% } else { %>
+  <section class="grid">
+    <% items.forEach(function(product){ %>
+      <%- include('partials/card', { product: product }) %>
+    <% }); %>
+  </section>
+<% } %>
+
+<%- include('partials/footer') %>

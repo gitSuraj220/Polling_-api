@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+
+<h1 class="page-title">Shopping Bag</h1>
+
+<% if (items.length === 0) { %>
+  <div class="empty-state">
+    <p>Your bag is empty.</p>
+    <a href="/" class="btn-primary">Continue Shopping</a>
+  </div>
+<% } else { %>
+  <section class="cart-layout">
+    <div class="cart-items">
+      <% items.forEach(function(item){ %>
+        <div class="cart-row">
+          <a href="/product/<%= item.id %>"><img src="<%= item.image %>" alt="<%= item.name %>" /></a>
+          <div class="cart-meta">
+            <div class="brand"><%= item.brand %></div>
+            <div class="name"><%= item.name %></div>
+            <div class="price">
+              <span class="now">₹<%= item.price.toLocaleString('en-IN') %></span>
+              <span class="mrp">₹<%= item.mrp.toLocaleString('en-IN') %></span>
+            </div>
+            <form action="/cart/update/<%= item.id %>" method="post" class="qty-form">
+              <label>Qty</label>
+              <input type="number" name="qty" min="1" value="<%= item.qty %>" onchange="this.form.submit()" />
+            </form>
+          </div>
+          <form action="/cart/remove/<%= item.id %>" method="post">
+            <button type="submit" class="remove" aria-label="Remove">✕</button>
+          </form>
+        </div>
+      <% }); %>
+    </div>
+
+    <aside class="cart-summary">
+      <h3>Price Details</h3>
+      <div class="row"><span>Bag Total</span><span>₹<%= (total + savings).toLocaleString('en-IN') %></span></div>
+      <div class="row discount"><span>Discount</span><span>− ₹<%= savings.toLocaleString('en-IN') %></span></div>
+      <div class="row"><span>Shipping</span><span class="free">FREE</span></div>
+      <div class="row total"><span>Total Amount</span><span>₹<%= total.toLocaleString('en-IN') %></span></div>
+      <button class="btn-primary big full" onclick="alert('This is a demo — checkout is not implemented.')">Place Order</button>
+    </aside>
+  </section>
+<% } %>
+
+<%- include('partials/footer') %>

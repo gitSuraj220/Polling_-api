@@ -1,16 +1,20 @@
 
 const express = require('express');
+const path    = require('path');
 
 const app = express();
 const port = 7200;
 
 const db = require('./config/mongoose');
 
-// middle for parse form data
+// serve landing page
+app.use(express.static(path.join(__dirname, 'public')));
+
+// middleware for parse form data
 app.use(express.urlencoded({ extended : true }));
 app.use(express.json());
 
-// route for home
+// routes
 app.use('/', require('./routes/index'));
 
 app.listen(port, function(err){
